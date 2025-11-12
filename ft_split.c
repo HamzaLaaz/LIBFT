@@ -1,0 +1,98 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   ft_split.c                                         :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: hlaaz <hlaaz@student.1337.ma>              +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/10/26 15:22:27 by hlaaz             #+#    #+#             */
+/*   Updated: 2025/10/28 03:38:55 by hlaaz            ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "libft.h"
+
+static int	count_words(char const *s, char c)
+{
+	int	i;
+	int	count;
+
+	i = 0;
+	count = 0;
+	while (s[i])
+	{
+		if (s[i] != c)
+		{
+			count++;
+			while (s[i] && s[i] != c)
+				i++;
+		}
+		else
+			i++;
+	}
+	return (count);
+}
+
+static char	*print_words(char const **s, char c)
+{
+	char		*str;
+	char const	*ptr;
+	int			i;
+	int			j;
+
+	while (**s && **s == c)
+		(*s)++;
+	ptr = *s;
+	i = 0;
+	while (ptr[i] && ptr[i] != c)
+		i++;
+	str = malloc(i + 1);
+	if (!str)
+		return (NULL);
+	j = 0;
+	while (j < i)
+	{
+		str[j] = ptr[j];
+		j++;
+	}
+	str[j] = '\0';
+	*s += i;
+	return (str);
+}
+
+static void	free_all(char **strs, int i)
+{
+	while (i >= 0)
+	{
+		free(strs[i]);
+		i--;
+	}
+	free(strs);
+}
+
+char	**ft_split(char const *s, char c)
+{
+	char	**strs;
+	int		count;
+	int		i;
+
+	if (!s)
+		return (NULL);
+	count = count_words(s, c);
+	strs = (char **)malloc(sizeof(char *) * (count + 1));
+	if (!strs)
+		return (NULL);
+	i = 0;
+	while (i < count)
+	{
+		strs[i] = print_words(&s, c);
+		if (!strs[i])
+		{
+			free_all(strs, i - 1);
+			return (NULL);
+		}
+		i++;
+	}
+	strs[i] = NULL;
+	return (strs);
+}
